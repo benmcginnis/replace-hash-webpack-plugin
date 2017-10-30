@@ -79,14 +79,23 @@ ReplaceHashPlugin.prototype.apply = function (compiler) {
                   })
                 }
                 if (query) {
-                  filename = query.name;
+                  if (typeof query.name === "function") {
+                    filename = query.name(item);
+                  } else {
+                    filename = query.name;
+                  }
+
                 } else {
                   filename = '[hash].[ext]';
                 }
               }
             })
         }
-        var hashLengthMatches = filename.match(/\[\S*hash:(\d+)\]/i);
+        try {
+          var hashLengthMatches = filename.match(/\[\S*hash:(\d+)\]/i);
+        } catch (e) {
+          console.log('[warnings]%s replace hash failed', item, e);
+        }
         var hashLength;
         if (hashLengthMatches) {
           if (hashLengthMatches[1]) {
